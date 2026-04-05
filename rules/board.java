@@ -1,3 +1,5 @@
+package rules;
+
 import java.util.Random;
 
 public class board {
