@@ -2,15 +2,7 @@ package rules;
 
 import java.util.Random;
 
-public class board {
-    
-    public static void main(String[] args) {
-        int [][] current = new int[50][50]; 
-        int [][] next = new int [50][50];
-        
-        start(current);
-        evolve(current, next);     
-    }
+public class Board {
 
     public static void start(int[][] current) {
         Random generator = new Random();
