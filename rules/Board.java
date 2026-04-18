@@ -9,13 +9,12 @@ public class Board {
         for(int l=0; l<current.length; l++) {
             for(int c=0; c<current[l].length; c++) {
                 double vitality = generator.nextDouble();
-                if (vitality > 0.6) {
+                if (vitality > 0.8) {
                     current[l][c]=1;
                 }
                 else {
                     current[l][c]=0;
                 } 
-            System.out.print(current[l][c]==1 ? " 1:🦠 " : " 0:☠️  ");
             }
         System.out.println();
         System.out.println();
@@ -47,7 +46,6 @@ public class Board {
                     else if(current[l][c]==0 && simbiosis==3){
                         next[l][c]=1;
                         }
-                    System.out.print(next[l][c]==1 ? " 1e:🦠 " : " 0e:☠️  ");    
                     }
                 System.out.println();
                 System.out.println();
