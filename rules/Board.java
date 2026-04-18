@@ -1,27 +1,20 @@
+package rules;
+
 import java.util.Random;
 
-public class board {
-    
-    public static void main(String[] args) {
-        int [][] current = new int[50][50]; 
-        int [][] next = new int [50][50];
-        
-        start(current);
-        evolve(current, next);     
-    }
+public class Board {
 
     public static void start(int[][] current) {
         Random generator = new Random();
         for(int l=0; l<current.length; l++) {
             for(int c=0; c<current[l].length; c++) {
                 double vitality = generator.nextDouble();
-                if (vitality > 0.6) {
+                if (vitality > 0.8) {
                     current[l][c]=1;
                 }
                 else {
                     current[l][c]=0;
                 } 
-            System.out.print(current[l][c]==1 ? " 1:🦠 " : " 0:☠️  ");
             }
         System.out.println();
         System.out.println();
@@ -53,7 +46,6 @@ public class board {
                     else if(current[l][c]==0 && simbiosis==3){
                         next[l][c]=1;
                         }
-                    System.out.print(next[l][c]==1 ? " 1e:🦠 " : " 0e:☠️  ");    
                     }
                 System.out.println();
                 System.out.println();
