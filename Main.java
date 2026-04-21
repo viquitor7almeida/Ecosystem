@@ -1,4 +1,5 @@
 import rules.Board;
+import rules.EvolutionRules;
 import painel.Visual;
 import javax.swing.Timer;
 
@@ -25,7 +26,7 @@ public class Main {
 
     // Método centralizado para evitar repetição de código (DRY)
     private static void executarEvolucao(int[][] current, int[][] next, Visual tela) {
-        Board.evolve(current, next);
+        EvolutionRules.evolve(current, next);
         
         // Swap de memória
         for (int l = 0; l < current.length; l++) {
