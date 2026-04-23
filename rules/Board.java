@@ -2,6 +2,8 @@ package rules;
 
 import java.util.Random;
 
+import models.Cells;
+
 public class Board {
 
     public static void start(int[][] current) {
@@ -19,5 +21,23 @@ public class Board {
         System.out.println();
         System.out.println();
             }
+        }
+
+        //click para criar predador
+        public void clickPredator(int[][] current, int l, int c){
+        int id_predator = Cells.CellType.PREDATOR_CELL.getcellNumber();
+        current[l][c] = id_predator;
+        }
+
+        //click para criar anjo
+        public void clickAngel(int[][] current, int l, int c){
+        int id_angel = Cells.CellType.ANGEL_CEll.getcellNumber();
+        current[l][c] = id_angel;
+        }
+
+        //click para criar guerreiro
+        public void clickWarrior(int[][] current, int l, int c){
+        int id_warrior = Cells.CellType.WARRIOR_CELL.getcellNumber();
+        current[l][c] = id_warrior;
         }
     }
