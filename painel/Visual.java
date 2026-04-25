@@ -5,29 +5,63 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.*;
-import java.util.function.BiConsumer;
+import models.Cells;
 
 public class Visual extends JFrame {
+
+    public interface CellClickHandler {
+        void handle(int linha, int coluna, int tipoSelecionado);
+    }
 
     private final PainelBioquimico painel;
     private float pulsoAnimacao = 0f;
     private long lastTick = System.currentTimeMillis();
     private float progressoTimer = 0f;
+    private int modoDesenho = 1;
 
-    public Visual(int[][] matriz, Runnable onEvolve, BiConsumer<Integer, Integer> onCellClick) {
-        setTitle("BIO-SYNTH | Advanced Chemical Evolution");
+    public Visual(int[][] matriz, Runnable onEvolve, CellClickHandler onCellClick) {
+        setTitle("BIO-SYNTH | Control Terminal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(600, 750));
+        setMinimumSize(new Dimension(1050, 800));
         setLayout(new BorderLayout());
+        getContentPane().setBackground(new Color(5, 7, 10));
+
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
+        sidePanel.setPreferredSize(new Dimension(250, 0));
+        sidePanel.setBackground(new Color(12, 15, 20));
+        sidePanel.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new Color(0, 255, 150, 80)));
+
+        sidePanel.add(Box.createVerticalStrut(20));
 
         JButton btnEvoluir = new JButton("FORÇAR EVOLUÇÃO");
-        btnEvoluir.setBackground(new Color(20, 30, 40));
+        btnEvoluir.setMaximumSize(new Dimension(200, 45));
+        btnEvoluir.setBackground(new Color(5, 7, 10));
         btnEvoluir.setForeground(new Color(0, 255, 150));
         btnEvoluir.setFont(new Font("Monospaced", Font.BOLD, 14));
         btnEvoluir.setFocusPainted(false);
-        btnEvoluir.setBorder(BorderFactory.createLineBorder(new Color(0, 255, 150), 1));
+        btnEvoluir.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnEvoluir.setBorder(BorderFactory.createLineBorder(new Color(0, 255, 150)));
         btnEvoluir.addActionListener(e -> onEvolve.run());
-        add(btnEvoluir, BorderLayout.NORTH);
+        sidePanel.add(btnEvoluir);
+
+        sidePanel.add(Box.createVerticalStrut(40));
+
+        JLabel lblModo = new JLabel("MODO DE INSERÇÃO");
+        lblModo.setForeground(new Color(0, 255, 150));
+        lblModo.setFont(new Font("Monospaced", Font.BOLD, 12));
+        lblModo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        sidePanel.add(lblModo);
+
+        sidePanel.add(Box.createVerticalStrut(15));
+
+        ButtonGroup group = new ButtonGroup();
+        adicionarBotaoModo("VIVO (Padrão)", 1, group, sidePanel, true);
+        adicionarBotaoModo("PREDADOR", Cells.CellType.PREDATOR_CELL.getcellNumber(), group, sidePanel, false);
+        adicionarBotaoModo("GUERREIRO", Cells.CellType.WARRIOR_CELL.getcellNumber(), group, sidePanel, false);
+        adicionarBotaoModo("ANJO", Cells.CellType.ANGEL_CEll.getcellNumber(), group, sidePanel, false);
+
+        add(sidePanel, BorderLayout.EAST);
 
         this.painel = new PainelBioquimico(matriz);
         this.painel.addMouseListener(new MouseAdapter() {
@@ -35,19 +69,21 @@ public class Visual extends JFrame {
             public void mousePressed(MouseEvent e) {
                 int colunas = matriz[0].length;
                 int linhas = matriz.length;
-                
-                int j = (int) (e.getX() / ((float) painel.getWidth() / colunas));
-                int i = (int) ((e.getY() - 40) / ((float) (painel.getHeight() - 40) / linhas));
+                float celulaW = (float) painel.getWidth() / colunas;
+                float celulaH = (float) (painel.getHeight() - 40) / linhas;
+                int j = (int) (e.getX() / celulaW);
+                int i = (int) ((e.getY() - 40) / celulaH);
 
                 if (i >= 0 && i < linhas && j >= 0 && j < colunas) {
-                    onCellClick.accept(i, j);
+                    onCellClick.handle(i, j, modoDesenho);
+                    painel.repaint();
                 }
             }
         });
         add(this.painel, BorderLayout.CENTER);
 
         Timer animador = new Timer(16, e -> {
-            pulsoAnimacao += 0.05f;
+            pulsoAnimacao += 0.08f;
             long agora = System.currentTimeMillis();
             progressoTimer = ((agora - lastTick) % 30000) / 30000f; 
             painel.repaint();
@@ -59,6 +95,20 @@ public class Visual extends JFrame {
         setVisible(true);
     }
 
+    private void adicionarBotaoModo(String texto, int tipo, ButtonGroup group, JPanel panel, boolean selecionado) {
+        JRadioButton btn = new JRadioButton(texto);
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(new Color(12, 15, 20));
+        btn.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        btn.setFocusPainted(false);
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setSelected(selecionado);
+        btn.addActionListener(e -> modoDesenho = tipo);
+        group.add(btn);
+        panel.add(btn);
+        panel.add(Box.createVerticalStrut(10));
+    }
+
     public void colorAtualizer(int[][] matriz) {
         painel.setMatriz(matriz);
         lastTick = System.currentTimeMillis(); 
@@ -66,11 +116,15 @@ public class Visual extends JFrame {
 
     private class PainelBioquimico extends JPanel {
         private int[][] matriz;
+        private final Color COLOR_BG = new Color(3, 5, 8);
+        private final Color COLOR_ALIVE = new Color(0, 255, 150);
+        private final Color COLOR_PREDATOR = new Color(255, 40, 60);
+        private final Color COLOR_WARRIOR = new Color(170, 80, 255);
+        private final Color COLOR_ANGEL = new Color(255, 255, 180);
 
         public PainelBioquimico(int[][] matriz) {
             this.matriz = matriz;
-            setBackground(new Color(5, 7, 10));
-            setPreferredSize(new Dimension(800, 800));
+            setBackground(COLOR_BG);
         }
 
         public void setMatriz(int[][] novaMatriz) {
@@ -83,69 +137,110 @@ public class Visual extends JFrame {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            drawTimer(g2d);
+            drawHeader(g2d);
 
             int colunas = matriz[0].length;
             int linhas = matriz.length;
-
             float celulaW = (float) getWidth() / colunas;
             float celulaH = (float) (getHeight() - 40) / linhas; 
-            float tamanhoBase = Math.min(celulaW, celulaH) * 0.8f;
-            float fatorPulso = (float) (Math.sin(pulsoAnimacao) * 2.0f);
+            float tamBase = Math.min(celulaW, celulaH) * 0.82f;
+            float pulso = (float) (Math.sin(pulsoAnimacao) * 1.5f);
+
+            int PREDATOR_ID = Cells.CellType.PREDATOR_CELL.getcellNumber();
+            int WARRIOR_ID = Cells.CellType.WARRIOR_CELL.getcellNumber();
+            int ANGEL_ID = Cells.CellType.ANGEL_CEll.getcellNumber();
 
             for (int i = 0; i < linhas; i++) {
                 for (int j = 0; j < colunas; j++) {
-                    float x = j * celulaW + (celulaW - tamanhoBase) / 2;
-                    float y = 40 + i * celulaH + (celulaH - tamanhoBase) / 2;
+                    float x = j * celulaW + (celulaW - tamBase) / 2;
+                    float y = 40 + i * celulaH + (celulaH - tamBase) / 2;
+                    int type = matriz[i][j];
 
-                    if (matriz[i][j] == 1) {
-                        drawCell(g2d, x, y, tamanhoBase, fatorPulso);
+                    if (type != 0) {
+                        if (type == PREDATOR_ID) {
+                            renderEntity(g2d, x, y, tamBase, pulso, COLOR_PREDATOR, createPoly(x+tamBase/2, y+tamBase/2, tamBase+pulso, 3, pulsoAnimacao));
+                        } else if (type == WARRIOR_ID) {
+                            renderEntity(g2d, x, y, tamBase, pulso, COLOR_WARRIOR, createPoly(x+tamBase/2, y+tamBase/2, tamBase+pulso, 6, 0));
+                        } else if (type == ANGEL_ID) {
+                            renderEntity(g2d, x, y, tamBase, pulso, COLOR_ANGEL, createCross(x+tamBase/2, y+tamBase/2, tamBase+pulso));
+                        } else {
+                            renderEntity(g2d, x, y, tamBase, pulso, COLOR_ALIVE, new Ellipse2D.Float(x - pulso/2, y - pulso/2, tamBase+pulso, tamBase+pulso));
+                        }
                     } else {
-                        drawEmpty(g2d, x, y, tamanhoBase);
+                        renderGrid(g2d, x, y, tamBase);
                     }
                 }
             }
         }
 
-        private void drawTimer(Graphics2D g2d) {
-            int w = getWidth();
-            g2d.setColor(new Color(20, 25, 30));
-            g2d.fillRect(0, 0, w, 40);
-
-            g2d.setColor(new Color(0, 255, 150, 40));
-            g2d.fillRect(0, 35, (int)(w * progressoTimer), 5);
-
-            g2d.setFont(new Font("Monospaced", Font.BOLD, 12));
-            g2d.setColor(new Color(0, 255, 150));
-            String status = "PRÓXIMA EVOLUÇÃO EM: " + (int)(30 - (progressoTimer * 30)) + "s";
-            g2d.drawString(status, 20, 25);
-        }
-
-        private void drawCell(Graphics2D g2d, float x, float y, float tam, float pulso) {
-            float tamPulsado = tam + pulso;
-            RadialGradientPaint glow = new RadialGradientPaint(
-                new Point2D.Float(x + tam/2, y + tam/2),
-                tamPulsado * 0.8f,
-                new float[]{0f, 1f},
-                new Color[]{new Color(0, 255, 120, 50), new Color(0, 255, 120, 0)}
-            );
-            g2d.setPaint(glow);
-            g2d.fill(new Ellipse2D.Float(x - pulso, y - pulso, tamPulsado, tamPulsado));
-
-            g2d.setPaint(new GradientPaint(x, y, new Color(0, 180, 100), x + tam, y + tam, new Color(0, 80, 50)));
-            g2d.fill(new Ellipse2D.Float(x, y, tam, tam));
-
-            g2d.setColor(new Color(200, 255, 230, 200));
-            g2d.fill(new Ellipse2D.Float(x + tam*0.3f, y + tam*0.25f, tam*0.35f, tam*0.35f));
+        private void renderEntity(Graphics2D g2d, float x, float y, float tam, float pulso, Color c, Shape s) {
+            float cx = x + tam/2;
+            float cy = y + tam/2;
+            float glowSize = tam * 1.3f;
             
+            RadialGradientPaint rgp = new RadialGradientPaint(
+                new Point2D.Float(cx, cy), glowSize,
+                new float[]{0f, 1f},
+                new Color[]{new Color(c.getRed(), c.getGreen(), c.getBlue(), 50), new Color(0,0,0,0)}
+            );
+            g2d.setPaint(rgp);
+            g2d.fill(new Ellipse2D.Float(cx - glowSize, cy - glowSize, glowSize*2, glowSize*2));
+
+            g2d.setPaint(new GradientPaint(x, y, c, x + tam, y + tam, c.darker().darker()));
+            g2d.fill(s);
+
+            g2d.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 180));
+            g2d.setStroke(new BasicStroke(1.2f));
+            g2d.draw(s);
+
             g2d.setColor(Color.WHITE);
-            g2d.fill(new Ellipse2D.Float(x + tam*0.35f, y + tam*0.3f, tam*0.1f, tam*0.1f));
+            float core = tam * 0.15f;
+            g2d.fill(new Ellipse2D.Float(cx - core/2, cy - core/2, core, core));
         }
 
-        private void drawEmpty(Graphics2D g2d, float x, float y, float tam) {
-            g2d.setColor(new Color(20, 25, 35));
-            g2d.setStroke(new BasicStroke(1.0f));
-            g2d.draw(new Ellipse2D.Float(x + tam*0.2f, y + tam*0.2f, tam*0.6f, tam*0.6f));
+        private void renderGrid(Graphics2D g2d, float x, float y, float tam) {
+            g2d.setColor(new Color(255, 255, 255, 10));
+            float offset = tam * 0.45f;
+            g2d.draw(new Line2D.Float(x+offset, y+tam/2, x+tam-offset, y+tam/2));
+            g2d.draw(new Line2D.Float(x+tam/2, y+offset, x+tam/2, y+tam-offset));
+        }
+
+        private void drawHeader(Graphics2D g2d) {
+            g2d.setColor(new Color(10, 12, 18));
+            g2d.fillRect(0, 0, getWidth(), 40);
+            
+            g2d.setColor(new Color(0, 255, 150, 40));
+            g2d.fillRect(0, 37, (int)(getWidth() * progressoTimer), 3);
+
+            g2d.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            g2d.setColor(new Color(0, 255, 150));
+            String txt = "SYNTHETIC_CYCLE_MONITOR: " + (int)(30 - (progressoTimer * 30)) + "s TO NEXT EVOLUTION";
+            g2d.drawString(txt, 15, 25);
+        }
+
+        private Shape createPoly(float x, float y, float t, int l, float rot) {
+            Path2D p = new Path2D.Float();
+            float r = t / 2;
+            for (int i = 0; i < l; i++) {
+                double a = rot + i * 2 * Math.PI / l;
+                float px = (float)(x + Math.cos(a) * r);
+                float py = (float)(y + Math.sin(a) * r);
+                if (i == 0) p.moveTo(px, py); else p.lineTo(px, py);
+            }
+            p.closePath();
+            return p;
+        }
+
+        private Shape createCross(float x, float y, float t) {
+            Path2D p = new Path2D.Float();
+            float r = t/2;
+            float w = t/4;
+            p.moveTo(x-w/2, y-r); p.lineTo(x+w/2, y-r); p.lineTo(x+w/2, y-w/2);
+            p.lineTo(x+r, y-w/2); p.lineTo(x+r, y+w/2); p.lineTo(x+w/2, y+w/2);
+            p.lineTo(x+w/2, y+r); p.lineTo(x-w/2, y+r); p.lineTo(x-w/2, y+w/2);
+            p.lineTo(x-r, y+w/2); p.lineTo(x-r, y-w/2); p.lineTo(x-w/2, y-w/2);
+            p.closePath();
+            return p;
         }
     }
 }
