@@ -13,7 +13,6 @@ public class EvolutionRules {
                 int simbiosis = countLocalNeighbors(current, l, c);
 
                 if (current[l][c] == 1) {
-                    // Célula Viva
                     if (simbiosis < 2 || simbiosis > 3) {
                         next[l][c] = 0; 
                     } else {
