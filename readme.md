@@ -1,26 +1,75 @@
-## About the Project
+# BIO-SYNTH | Advanced Chemical Evolution Simulator
 
-This application was created as a practical way to study core Java concepts, especially the ones that usually feel more abstract, such as:
+**BIO-SYNTH** is a biological simulation engine developed in Java designed to explore emergent complexity through chemical evolution algorithms. The project utilizes parallel processing to simulate thousands of cellular interactions in real-time, enabling the observation of colonies, mutations, and symbiotic behaviors.
 
-- Memory addressing  
-- Stack and heap behavior  
-- JIT (Just-In-Time Compiler)  
-- Garbage Collector  
+---
 
-The goal is to move away from pure theory and actually observe these concepts working in a simple but dynamic environment.
+## Project Highlights
 
-## What the App Does
+### Decoupled Architecture (SOLID)
+Unlike conventional simulators, **BIO-SYNTH** applies the Open/Closed Principle (OCP). The rendering engine and the calculation core are independent of the evolution rules.
+*   **Engine:** Responsible for matrix management and data lifecycle.
+*   **Rules:** Pluggable interfaces allow for the injection of new survival logics without modifying the system's core.
 
-The system simulates a kind of chemical evolution between RNAs. Based on this idea, the program's behavior is built using only basic language features, such as:
+### Parallel Processing (Multithreading)
+To ensure high performance in high-density matrices, the simulation efficiently distributes the workload:
+*   The matrix is fragmented into regions processed simultaneously by different CPU cores.
+*   Implementation focuses on maximizing data throughput using Java's native thread management.
 
-- Arrays to represent structures and states  
-- Logical operations to define interaction rules  
-- Loops to simulate evolution over time  
-- Input and output to track the process  
-- Object lifecycle to observe allocation, usage, and memory cleanup  
+### Bio-Luminescent Visualization
+The interface was developed in Java Swing with a focus on laboratory aesthetics and visual clarity:
+*   Rendering via **Graphics2D** with Anti-aliasing to eliminate jagged edges.
+*   Dynamic glow effects and pulsation animations that simulate living membrane activity.
+*   Interactive dashboard featuring an evolution timer and support for direct manipulation via peripherals.
 
-## Purpose
+---
 
-Rather than aiming for a scientifically accurate simulation, the focus of this project is to act as a learning tool. Each part of the code is designed to help visualize how Java handles memory and execution at runtime.
+## Simulation Concepts
 
-It’s simple on the surface, but useful for understanding what’s usually hidden behind the JVM.
+The ecosystem supports multiple cellular states with distinct behaviors:
+
+| Type | Behavior | Visual Identity |
+| :--- | :--- | :--- |
+| **Common** | Follows classical laws of survival and reproduction. | Neon Green |
+| **Chemical** | Acts as a catalyst, facilitating the emergence of new cells. | Bright Cyan |
+| **Resistant** | Reinforced membrane structure, surviving overpopulation. | Amber |
+
+---
+
+## Technologies Used
+
+*   **Language:** Java 17+
+*   **GUI:** Java Swing / Graphics2D
+*   **Concurrency:** Java Util Concurrent (Executors / Threading)
+*   **Design Patterns:** Strategy Pattern (Rules), MVC (Model-View-Controller)
+
+---
+
+## How to Run the Experiment
+
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-user/bio-synth.git](https://github.com/your-user/bio-synth.git)
+    ```
+2.  **Compile the modules:**
+    ```bash
+    javac src/Main.java
+    ```
+3.  **Launch the simulation:**
+    ```bash
+    java src/Main
+    ```
+
+---
+
+## Evolution Roadmap
+
+- High-Performance Interface completion.
+- Implementation of Rule-based Architecture (OCP).
+- Development of Parallel Processing for large-scale matrices (500x500).
+- Random Genetic Mutation system.
+- Data persistence and state exportation in JSON format.
+
+---
+
+> "Life is not just a state, but a process of continuous interaction."
