@@ -69,7 +69,3 @@ The ecosystem supports multiple cellular states with distinct behaviors:
 - Development of Parallel Processing for large-scale matrices (500x500).
 - Random Genetic Mutation system.
 - Data persistence and state exportation in JSON format.
-
----
-
-> "Life is not just a state, but a process of continuous interaction."
