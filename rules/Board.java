@@ -6,6 +6,7 @@ import models.Cells;
 
 public class Board {
 
+    //metodo de populacao do ecossistema
     public static void start(int[][] current) {
         Random generator = new Random();
         for(int l=0; l<current.length; l++) {

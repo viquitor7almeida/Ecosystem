@@ -32,7 +32,6 @@ public class Main {
                 } else if (modoSelecionado == models.Cells.CellType.WARRIOR_CELL.getcellNumber()) {
                     boardController.clickWarrior(current, linha, coluna);
                 }
-                // Repinta imediatamente após o clique para dar feedback visual
                 windowRef[0].colorAtualizer(current);
             }
         );
@@ -44,6 +43,7 @@ public class Main {
         mainCycleTimer.start();
     }
 
+    //execucao de ciclo de evolucao completo
     private static void executeFullCycle(int[][] current, int[][] next, Visual window) {
         for (int i = 0; i < next.length; i++) {
             Arrays.fill(next[i], 0);

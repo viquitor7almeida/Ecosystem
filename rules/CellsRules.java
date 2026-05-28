@@ -8,6 +8,7 @@ public class CellsRules {
 
     private static final Random rand = new Random();
 
+    //sistema de batalha entre celulas
     public static void battles(int[][] current, int[][] next, int l, int c) {
         int id_predator = Cells.CellType.PREDATOR_CELL.getcellNumber();
         int id_alive = Cells.CellType.ALIVE_CELL.getcellNumber();
@@ -46,6 +47,7 @@ public class CellsRules {
         }
     }
 
+    //metodo de salvamento entre celulas
     public static void saves(int[][] current, int[][] next, int l, int c) {
         int id_alive = Cells.CellType.ALIVE_CELL.getcellNumber();
         int id_dead = Cells.CellType.DEAD_CELL.getcellNumber();
@@ -66,6 +68,7 @@ public class CellsRules {
         }
     }
 
+    //metodos de criacao de celulas mutantes
     public static void mutations(int[][] current, int[][] next, int l, int c) {
         int id_predator = Cells.CellType.PREDATOR_CELL.getcellNumber();
         int id_alive = Cells.CellType.ALIVE_CELL.getcellNumber();

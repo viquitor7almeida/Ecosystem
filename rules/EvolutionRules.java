@@ -2,6 +2,7 @@ package rules;
 
 public class EvolutionRules {
 
+    //metodo de evolucao padrao
     public static void evolve(int[][] current, int[][] next) {
         for (int l = 0; l < current.length; l++) {
             for (int c = 0; c < current[l].length; c++) {
@@ -29,6 +30,7 @@ public class EvolutionRules {
         }
     }
 
+    //metodo de contagem de celulas proximas
     private static int countLocalNeighbors(int[][] current, int l, int c) {
         int count = 0;
         for (int i = -1; i <= 1; i++) {
